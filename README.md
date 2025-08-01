@@ -33,6 +33,11 @@ Now, just run the help.sh and it will create an .iso file and run it in qemu. Yo
 A list of current commands in the CLI mode:
 ```
 sysinfo - Gives information about your cpu
+help - Gives a list of current accessible commands
+crashtest <num> - Triggers an exception by the number <num>
+shutdown - Firstly tries to turn off by ACPI, then fallbacks to QEMU method
+clear - Clears the CLI
+exit - Back to GUI Mode
 ```
 
 ***Happy Coding!***
