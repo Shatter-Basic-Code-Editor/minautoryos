@@ -50,7 +50,7 @@ gdt_flush:
 flush_cs:
     ret
 
-/* --- INTERRUPT SERVICE ROUTINES (ISRs) --- */
+/* --- Interrupt Service Routines --- */
 /* This macro creates a stub for an ISR that does not have an error code */
 .macro ISR_NOERR int_no
 .global isr\int_no
@@ -70,8 +70,7 @@ isr_common_stub:
 
     movw $0x10, %ax     /* Load the kernel data segment descriptor */
     movw %ax, %ds; movw %ax, %es; movw %ax, %fs; movw %ax, %gs
-
-    /* THE CRITICAL FIX: Pass a pointer to the stack to the C handler */
+    
     movl %esp, %eax     /* Get the current stack pointer */
     pushl %eax          /* Push it as the argument for our C function */
 
@@ -151,7 +150,6 @@ cpuid:
     movl %ecx, (%edi); movl 24(%ebp), %edi; movl %edx, (%edi);
     popl %ebx; movl %ebp, %esp; popl %ebp; ret
 
-/* New function to load the IDT register */
 .global idt_load
 .type idt_load, @function
 idt_load:
