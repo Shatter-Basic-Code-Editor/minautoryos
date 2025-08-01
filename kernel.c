@@ -54,7 +54,6 @@ int selected_menu_item = 5;
 
 /* --- Main OS Loops --- */
 void gui_event_loop() {
-    // THIS IS THE FIX: Re-initialize the entire GUI screen every time we enter this mode.
     terminal_initialize(VGA_COLOR_BLACK, VGA_COLOR_BLUE);
     terminal_writestring_at("Welcome to MINAUTORY OS! Use Left/Right arrows to navigate the menu.", vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLUE), 2, 10);
     while (1) {
@@ -107,8 +106,8 @@ void kernel_main(void) {
     }
 }
 
-/* --- FUNCTION IMPLEMENTATIONS --- */
-// UTILITY FUNCTIONS
+/* --- Function Implementation --- */
+// Utilities
 size_t strlen(const char*s){size_t l=0;while(s[l])l++;return l;}
 int strcmp(const char*s1,const char*s2){while(*s1&&(*s1==*s2)){s1++;s2++;}return*(const unsigned char*)s1-*(const unsigned char*)s2;}
 int strncmp(const char*s1,const char*s2,size_t n){while(n&&*s1&&(*s1==*s2)){s1++;s2++;n--;}if(n==0)return 0;return*(unsigned const char*)s1-*(unsigned const char*)s2;}
@@ -134,12 +133,12 @@ void terminal_putchar(char c){if(c=='\n'){terminal_column=0;terminal_row++;}else
 void terminal_writestring(const char*d){for(size_t i=0;i<strlen(d);i++)terminal_putchar(d[i]);}
 void terminal_backspace(){if(terminal_column>2){terminal_column--;terminal_putentryat(' ',terminal_color,terminal_column,terminal_row);}}
 
-// SYSINFO AND ACPI
+// sysinfo and ACPI
 void command_sysinfo() {uint32_t a,b,c,d;char v[13];char br[49];cpuid(0,&a,&b,&c,&d);memcpy(v,&b,4);memcpy(v+4,&d,4);memcpy(v+8,&c,4);v[12]='\0';cpuid(0x80000002,&a,&b,&c,&d);memcpy(br,&a,4);memcpy(br+4,&b,4);memcpy(br+8,&c,4);memcpy(br+12,&d,4);cpuid(0x80000003,&a,&b,&c,&d);memcpy(br+16,&a,4);memcpy(br+20,&b,4);memcpy(br+24,&c,4);memcpy(br+28,&d,4);cpuid(0x80000004,&a,&b,&c,&d);memcpy(br+32,&a,4);memcpy(br+36,&b,4);memcpy(br+40,&c,4);memcpy(br+44,&d,4);br[48]='\0';terminal_writestring("\nCPU Vendor: ");terminal_writestring(v);terminal_writestring("\nCPU Brand: ");terminal_writestring(br);}
 int acpi_checksum(struct ACPISDTHeader*h){unsigned char s=0;for(uint32_t i=0;i<h->Length;i++){s+=((char*)h)[i];}return s==0;}
 void acpi_shutdown(){struct RSDPDescriptor*r=NULL;for(char*i=(char*)0xE0000;i<(char*)0x100000;i+=16){if(strncmp(i,"RSD PTR ",8)==0){r=(struct RSDPDescriptor*)i;break;}}if(!r){qemu_shutdown();return;}struct ACPISDTHeader*d=(struct ACPISDTHeader*)r->RsdtAddress;if(!d||!acpi_checksum(d)){qemu_shutdown();return;}int e=(d->Length-sizeof(struct ACPISDTHeader))/4;uint32_t*o=(uint32_t*)(d+1);struct FADT*f=NULL;for(int i=0;i<e;i++){struct ACPISDTHeader*h=(struct ACPISDTHeader*)o[i];if(strncmp(h->Signature,"FACP",4)==0&&acpi_checksum(h)){f=(struct FADT*)h;break;}}if(!f){qemu_shutdown();return;}outw((5<<10)|(1<<13),f->PM1aControlBlock);for(volatile int d=0;d<1000000;++d)__asm__("nop");qemu_shutdown();for(;;);}
 
-// GDT/IDT AND FAULT HANDLER
+// GDT/IDT and Fault Handler
 
 void fault_handler(struct registers_t* regs) {
     uint8_t panic_color = vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLUE);
