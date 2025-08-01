@@ -5,6 +5,11 @@
     but i kept some placeholders
     for you to do:
     -- File menu
+    -- Edit menu
+    Also, you can add more cli commands.
+    This OS can be useful for learning how to do your own.
+    
+    Happy coding!
 */
 
 
