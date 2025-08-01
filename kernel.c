@@ -118,7 +118,7 @@ char keyboard_read_char(){if(inb(0x64)&1){uint8_t sc=inb(0x60);if(sc<128 && kbdu
 uint8_t keyboard_read_scancode(void){static uint8_t l=0;uint8_t s=inb(0x60);if(s!=l){l=s;if((s&0x80)==0){return s;}}return 0;}
 void qemu_shutdown(){outw(0x2000, 0x604);}
 
-// UI AND TERMINAL FUNCTIONS
+// UI and Terminal functions
 static inline uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg){return fg|bg<<4;}
 static inline uint16_t vga_entry(unsigned char uc, uint8_t color){return(uint16_t)uc|(uint16_t)color<<8;}
 void terminal_putentryat(char c,uint8_t co,size_t x,size_t y){terminal_buffer[y*VGA_WIDTH+x]=vga_entry(c,co);}
