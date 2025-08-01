@@ -1,2 +1,28 @@
-# minautoryos
-A very basic dos-like operating system with a minimal gui and a cli with a few commands.
+# DISCLAIMER
+***Before using this, you ABSOLUTELY need to have some experience with operating system creation.
+I wont waste my time answering questions like "How to i make better gui", "How to make it support windows executables" and etc.
+If you dont have required knowledge (https://wiki.osdev.org/Required_Knowledge) then don't use this repository. Lets continue.***
+# MinautoryOS
+MinautoryOS is a lightweight skeleton of a operating system. It has a cli with a couple of commands (accessible through ***Debug*** option), a dos-like gui, and a working fault handler (you can test it in cli using ```crashtest <num>```. Everything else is just a placeholder. You can download this repository and make a fully working OS out of it.
+# Building
+Before building, ensure you have following dependencies:
+```
+GRUB (sudo apt install grub)
+QEMU (sudo apt install qemu-system)
+GCC-Crosscompiler (https://wiki.osdev.org/GCC_Cross-Compiler)
+```
+Then, modify the help.sh file and modify these lines:
+```
+/home/vasil/opt/cross/bin/i686-elf-as boot.s -o boot.o
+/home/vasil/opt/cross/bin/i686-elf-gcc -c kernel.c -o kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+/home/vasil/opt/cross/bin/i686-elf-gcc -T linker.ld -o myos.bin -ffreestanding -O2 -nostdlib boot.o kernel.o -lgcc
+```
+to:
+```
+/home/<username>/opt/cross/bin/i686-elf-as boot.s -o boot.o
+/home/<username>/opt/cross/bin/i686-elf-gcc -c kernel.c -o kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+/home/<username>/opt/cross/bin/i686-elf-gcc -T linker.ld -o myos.bin -ffreestanding -O2 -nostdlib boot.o kernel.o -lgcc
+```
+Now, just run the help.sh and it will create an .iso file and run it in qemu. You can also run it in any other emulator like VirtualBox.
+
+***Happy Coding!***
