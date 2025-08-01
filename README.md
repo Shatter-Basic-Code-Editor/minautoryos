@@ -29,6 +29,6 @@ Now, just run the help.sh and it will create an .iso file and run it in qemu. Yo
 A list of current commands in the CLI mode:
 ```
 sysinfo - Gives information about your cpu
-
+```
 
 ***Happy Coding!***
