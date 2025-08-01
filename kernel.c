@@ -1,3 +1,13 @@
+/*
+    Welcome to MinautoryOS's kernel!
+    The main logic of the OS is here.
+    You can do whatever you want,
+    but i kept some placeholders
+    for you to do:
+    -- File menu
+*/
+
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -11,6 +21,7 @@
 #define SCANCODE_RIGHT  0x4D
 #define SCANCODE_ENTER  0x1C
 long long bsod_timeout = 1000000000;
+char minautory[] = "V1.0 GITHUB RELEASE";
 enum vga_color {VGA_COLOR_BLACK=0,VGA_COLOR_BLUE,VGA_COLOR_GREEN,VGA_COLOR_CYAN,VGA_COLOR_RED,VGA_COLOR_MAGENTA,VGA_COLOR_BROWN,VGA_COLOR_LIGHT_GREY,VGA_COLOR_DARK_GREY,VGA_COLOR_LIGHT_BLUE,VGA_COLOR_LIGHT_GREEN,VGA_COLOR_LIGHT_CYAN,VGA_COLOR_LIGHT_RED,VGA_COLOR_LIGHT_MAGENTA,VGA_COLOR_LIGHT_BROWN,VGA_COLOR_WHITE,};
 enum OperatingMode { MODE_GUI, MODE_CLI };
 struct RSDPDescriptor { char Signature[8]; uint8_t Checksum; char OEMID[6]; uint8_t Revision; uint32_t RsdtAddress; } __attribute__ ((packed));
@@ -48,9 +59,9 @@ extern void isr16(); extern void isr17(); extern void isr18(); extern void isr19
 extern void isr24(); extern void isr25(); extern void isr26(); extern void isr27(); extern void isr28(); extern void isr29(); extern void isr30(); extern void isr31();
 
 /* --- UI State and Content --- */
-const char* menu_items[] = {"File", "Edit", "Search", "Run", "Compile", "Debug", "Tools", "Options", "Window", "Help"};
+const char* menu_items[] = {"File", "Edit", "Debug CLI"};
 const int menu_item_count = sizeof(menu_items) / sizeof(char*);
-int selected_menu_item = 5;
+int selected_menu_item = 0; /* Starts with 0*/
 
 /* --- Main OS Loops --- */
 void gui_event_loop() {
@@ -63,7 +74,7 @@ void gui_event_loop() {
                 case SCANCODE_LEFT: selected_menu_item = (selected_menu_item > 0) ? selected_menu_item - 1 : menu_item_count - 1; draw_top_bar(); break;
                 case SCANCODE_RIGHT: selected_menu_item = (selected_menu_item < menu_item_count - 1) ? selected_menu_item + 1 : 0; draw_top_bar(); break;
                 case SCANCODE_ENTER:
-                    if (selected_menu_item == 5) { current_mode = MODE_CLI; return; }
+                    if (selected_menu_item == 2) { current_mode = MODE_CLI; return; }
                     else { terminal_clear(); terminal_writestring_at("You selected:", vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLUE), 30, 10); terminal_writestring_at(menu_items[selected_menu_item], vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLUE), 32, 12); }
                     break;
             }
@@ -72,7 +83,9 @@ void gui_event_loop() {
 }
 void cli_command_loop() {
     terminal_initialize(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-    terminal_writestring("MINAUTORY OS [Debug Shell]\nType 'exit' to return to GUI.\n");
+    terminal_writestring("MINAUTORY OS [Debug Shell]\n");
+    terminal_writestring(minautory);
+    terminal_writestring("\nType 'exit' to go back, 'help' to list all commands");
     char command_buffer[128]; int command_index = 0;
     while (1) {
         terminal_writestring("\n> ");
@@ -87,7 +100,7 @@ void cli_command_loop() {
         command_buffer[command_index] = '\0';
         if (strcmp(command_buffer, "exit") == 0) { current_mode = MODE_GUI; return; }
         else if (strcmp(command_buffer, "help") == 0) { terminal_writestring("\nCommands: help, clear, sysinfo, shutdown, crashtest <num>, exit"); }
-        else if (strcmp(command_buffer, "clear") == 0) { terminal_initialize(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK); terminal_writestring("MINAUTORY OS [Debug Shell]\n"); }
+        else if (strcmp(command_buffer, "clear") == 0) { terminal_initialize(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK); terminal_writestring("MINAUTORY OS [Debug Shell]\n"); terminal_writestring(minautory); }
         else if (strcmp(command_buffer, "shutdown") == 0) { acpi_shutdown(); }
         else if (strcmp(command_buffer, "sysinfo") == 0) { command_sysinfo(); }
         else if (strncmp(command_buffer, "crashtest ", 10) == 0) {
